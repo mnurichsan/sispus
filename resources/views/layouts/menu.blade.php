@@ -13,10 +13,16 @@
         <div class="navbar-container main-menu-content" data-menu="menu-container">
             <!-- include ../../../includes/mixins-->
             <ul class="nav navbar-nav" id="main-menu-navigation" data-menu="menu-navigation">
-                <li class="nav-item" ><a class="nav-link" href=""><i class="feather icon-home"></i><span data-i18n="Dashboard">Dashboard</span></a>
+                <li class="nav-item" ><a class="nav-link" href="{{route('dashboard')}}"><i class="feather icon-home"></i><span data-i18n="Dashboard">Dashboard</span></a>
                    
                 </li>
-                <li class="nav-item" ><a class="nav-link" href=""><i class="feather icon-user"></i><span data-i18n="Data User">Data User</span></a>
+                <li class="nav-item" ><a class="nav-link" href="{{route('pasien.index')}}"><i class="feather icon-user"></i><span data-i18n="Data Pasien">Data Pasien</span></a>
+                   
+                </li>
+                <li class="nav-item" ><a class="nav-link" href=""><i class="feather icon-circle"></i><span data-i18n="Pemeriksaan Awal">Pemeriksaan Awal</span></a>
+                   
+                </li>
+                <li class="nav-item" ><a class="nav-link" href=""><i class="feather icon-circle"></i><span data-i18n="Pemeriksaan Lanjutan">Pemeriksaan Lanjutan</span></a>
                    
                 </li>
                 
