@@ -4,28 +4,45 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Pasien;
+use App\Models\KepalaKeluarga;
 use Haruncpi\LaravelIdGenerator\IdGenerator;
 use Alert;
+use Illuminate\Support\Facades\Validator;
 
 class PasienController extends Controller
 {
     public function index()
     {
-        $data =  Pasien::all();
+        $pasiens =  Pasien::with('kepalaKeluarga')->orderBy('kepala_keluarga_id', 'desc')->get();
+        $noKartuKeluarga  =  KepalaKeluarga::pluck('no_kk', 'id');
 
-        return view('pasien.index',compact('data'));
+        return view('pendaftaran.pasien.index', compact('pasiens', 'noKartuKeluarga'));
+    }
+
+    public function list()
+    {
+        $pasiens = Pasien::all();
+        return response()->json($pasiens);
     }
 
     public function store(Request $request)
     {
-        $this->validate($request,[
-            'nik' => 'required',
-            'nama_kk' => 'required',
-            'tanggal_lahir' => 'required',
-            'jenis_kelamin' => 'required',
-            'agama' => 'required',
-            'no_hp' => 'required'
+        $validator = Validator::make($request->all(), [
+            'nik'                   => 'required',
+            'nama_pasien'           => 'required',
+            'tempat_lahir'          => 'required',
+            'tanggal_lahir'         => 'required',
+            'alamat'                => 'required',
+            'jenis_kelamin'         => 'required',
+            'agama'                 => 'max:10',
+            'no_hp'                 => 'required',
+            'pekerjaan'             => 'max:255',
+            'no_kk'                 => 'required'
         ]);
+
+        if($validator->fails()){
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
 
         $cekNik = Pasien::where('nik',$request->nik)->first();
         if($cekNik)
@@ -35,14 +52,17 @@ class PasienController extends Controller
         }
 
         $data = [
-            'no_rekammedis' =>  IdGenerator::generate(['table' => 'pasiens','field'=>'no_rekammedis', 'length' => 10,'prefix' => 0]),
-            'nik' => $request->nik,
-            'nama_kk' => $request->nama_kk,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'agama' => $request->agama,
-            'no_hp' => $request->no_hp,
-            'alamat' => $request->alamat
+            'no_rekammedis'         =>  IdGenerator::generate(['table' => 'pasiens','field'=>'no_rekammedis', 'length' => 10,'prefix' => 0]),
+            'nik'                   => $request->nik,
+            'nama_pasien'           => $request->nama_pasien,
+            'tempat_lahir'          => $request->tempat_lahir,
+            'tanggal_lahir'         => $request->tanggal_lahir,
+            'alamat'                => $request->alamat,
+            'jenis_kelamin'         => $request->jenis_kelamin,
+            'agama'                 => $request->agama,
+            'no_hp'                 => $request->no_hp,
+            'pekerjaan'             => $request->pekerjaan,
+            'kepala_keluarga_id'    => $request->no_kk,
         ];
 
         Pasien::create($data);
@@ -50,40 +70,46 @@ class PasienController extends Controller
         return redirect()->back();
     }
 
-    public function show(Request $request)
-    {
-        //
-    }
-
     public function edit(Request $request)
     {
         $id = $request->id;
-        $data = Pasien::findOrFail($id);
+        $data = Pasien::with('kepalaKeluarga')->findOrFail($id);
 
         return response()->json($data);
     }
 
     public function update(Request $request)
     {
-        $this->validate($request,[
-            'nik' => 'required',
-            'nama_kk' => 'required',
-            'tanggal_lahir' => 'required',
-            'jenis_kelamin' => 'required',
-            'agama' => 'required',
-            'no_hp' => 'required'
+        $validator = Validator::make($request->all(), [
+            'nik'                   => 'required',
+            'nama_pasien'           => 'required',
+            'tempat_lahir'          => 'required',
+            'tanggal_lahir'         => 'required',
+            'alamat'                => 'required',
+            'jenis_kelamin'         => 'required',
+            'agama'                 => 'max:10',
+            'no_hp'                 => 'required',
+            'pekerjaan'             => 'max:255',
+            'no_kk'                 => 'required'
         ]);
+
+        if($validator->fails()){
+            return redirect()->back()->withInput()->withErrors($validator);
+        }
 
         $id = $request->id;
 
         $data = [
-            'nik' => $request->nik,
-            'nama_kk' => $request->nama_kk,
-            'tanggal_lahir' => $request->tanggal_lahir,
-            'jenis_kelamin' => $request->jenis_kelamin,
-            'agama' => $request->agama,
-            'no_hp' => $request->no_hp,
-            'alamat' => $request->alamat
+            'nik'                   => $request->nik,
+            'nama_pasien'           => $request->nama_pasien,
+            'tempat_lahir'          => $request->tempat_lahir,
+            'tanggal_lahir'         => $request->tanggal_lahir,
+            'alamat'                => $request->alamat,
+            'jenis_kelamin'         => $request->jenis_kelamin,
+            'agama'                 => $request->agama,
+            'no_hp'                 => $request->no_hp,
+            'pekerjaan'             => $request->pekerjaan,
+            'kepala_keluarga_id'    => $request->no_kk,
         ];
 
         Pasien::findOrFail($id)->update($data);
@@ -92,7 +118,7 @@ class PasienController extends Controller
 
     }
 
-    public function delete(Request $request)
+    public function destroy(Request $request)
     {
         $id = $request->id;
         

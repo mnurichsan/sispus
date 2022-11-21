@@ -67,20 +67,18 @@
                                         <p class="px-2">Selamat Datang Di Sistem Informasi Rawat Jalan Pasien Puskesmas Tanrutedong Sidrap.</p>
                                         <div class="card-content">
                                             <div class="card-body pt-1">
-                                                @if ($errors->any())
+                                                @if (session()->has('fail'))
                                                     <div class="alert alert-danger">
                                                         <ul>
-                                                            @foreach ($errors->all() as $error)
-                                                                <li>{{ $error }}</li>
-                                                            @endforeach
+                                                            <li>{{ session()->get('fail')}}</li>
                                                         </ul>
                                                     </div>
                                                 @endif
-                                                <form action="{{route('login')}}" method="POST">
+                                                <form action="{{route('login')}}" method="POST" class="pt-2">
                                                     @csrf
                                                     <fieldset class="form-label-group form-group position-relative has-icon-left">
-                                                        <input type="text" class="form-control" id="user-name" placeholder="Username" name="email" required>
-                                                        @error('email')
+                                                        <input type="text" class="form-control" id="user-name" placeholder="Username" name="name" value="{{ old('name') }}" required>
+                                                        @error('name')
                                                         <span class="invalid-feedback" role="alert">
                                                             <strong>{{ $message }}</strong>
                                                         </span>
